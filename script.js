@@ -95,9 +95,9 @@ const displayMovements = function (movements) {
 };
 
 // CALCULATE AND DISPLAY BALANCE
-const calcDisplayBalance = function (movements) {
-  const balance = movements.reduce((acc, mov) => acc + mov, 0);
-  labelBalance.textContent = `${balance}  €`;
+const calcDisplayBalance = function (account) {
+  account.balance = account.movements.reduce((acc, mov) => acc + mov, 0);
+  labelBalance.textContent = `${account.balance}  €`;
 };
 
 // CALCULATE TOTAL DEPOSITS, WITHDRAWALS AND INTEREST
@@ -136,6 +136,18 @@ const createUsername = function (accts) {
 
 createUsername(accounts);
 
+// UPDATE UI
+const updateUI = function (account) {
+  // Display movement
+  displayMovements(account.movements);
+
+  // Display balance
+  calcDisplayBalance(currentAccount);
+
+  // Display summary
+  calcDisplaySummary(currentAccount);
+};
+
 let currentAccount;
 
 // EVENT HANDLER FOR LOGIN
@@ -155,23 +167,43 @@ btnLogin.addEventListener('click', function (event) {
     containerApp.style.opacity = 100;
 
     // Clear input fields
-    inputLoginPin.value = '';
-    inputLoginUsername.value = '';
+    inputLoginPin.value = inputLoginUsername.value = '';
     inputLoginPin.blur();
 
-    // Display movement
-    displayMovements(currentAccount.movements);
-
-    // Display balance
-    calcDisplayBalance(currentAccount.movements);
-
-    // Display summary
-    calcDisplaySummary(currentAccount);
+    // Update UI
+    updateUI(currentAccount);
   } else {
     containerApp.style.opacity = 0;
     inputLoginPin.value = inputLoginUsername.value = '';
     inputLoginUsername.focus();
     labelWelcome.textContent = `Incorrect username or password, Try again!`;
+  }
+});
+
+// EVENT HANDLER FOR TRANSFER
+btnTransfer.addEventListener('click', function (event) {
+  event.preventDefault();
+  const receiverAcct = accounts.find(
+    acc => acc.username === inputTransferTo.value
+  );
+  const amount = Number(inputTransferAmount.value);
+
+  // Clear input fields
+  inputTransferTo.value = inputTransferAmount.value = '';
+  inputTransferAmount.blur();
+
+  if (
+    amount > 0 &&
+    receiverAcct &&
+    currentAccount.balance >= amount &&
+    receiverAcct?.username !== currentAccount.username
+  ) {
+    // Initiate transfer
+    currentAccount.movements.push(-amount);
+    receiverAcct.movements.push(amount);
+
+    // Update UI
+    updateUI(currentAccount);
   }
 });
 
