@@ -33,7 +33,14 @@ const account4 = {
   pin: 4444,
 };
 
-const accounts = [account1, account2, account3, account4];
+const account5 = {
+  owner: 'Olayiwola Shukurat',
+  movements: [430, 1000, 700, 50, 90, -150, -300],
+  interestRate: 1.4,
+  pin: 5555,
+};
+
+const accounts = [account1, account2, account3, account4, account5];
 
 // Elements
 const labelWelcome = document.querySelector('.welcome');
@@ -66,50 +73,107 @@ const inputClosePin = document.querySelector('.form__input--pin');
 // MOVEMENTS
 
 // Display movements in the UI
-const displayMovements = function(movements) {
-  
+const displayMovements = function (movements) {
   // Empty all the HTML element in the container
   containerMovements.innerHTML = '';
-  
-  movements.forEach(function(mov, i) {
+
+  movements.forEach(function (mov, i) {
     const type = mov > 0 ? 'deposit' : 'withdrawal';
-    
+
     const html = `
       <div class="movements__row">
-        <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
+        <div class="movements__type movements__type--${type}">${
+      i + 1
+    } ${type}</div>
           <div class="movements__date">3 days ago</div>
-          <div class="movements__value">${mov}</div>
+          <div class="movements__value">${mov}€</div>
       </div>
     `;
-    
-    containerMovements.insertAdjacentHTML('afterBegin', html);   
-  }); 
-}
 
-displayMovements(account1.movements);
-
+    containerMovements.insertAdjacentHTML('afterBegin', html);
+  });
+};
 
 // CALCULATE AND DISPLAY BALANCE
-const calcDisplayBalance = function(movements) {
+const calcDisplayBalance = function (movements) {
   const balance = movements.reduce((acc, mov) => acc + mov, 0);
   labelBalance.textContent = `${balance}  €`;
-}
+};
 
-calcDisplayBalance(account1.movements);
+// CALCULATE TOTAL DEPOSITS, WITHDRAWALS AND INTEREST
+const calcDisplaySummary = function (account) {
+  const totalDeposit = account.movements
+    .filter(mov => mov > 0)
+    .reduce((acc, cur) => acc + cur, 0);
+
+  labelSumIn.textContent = `${totalDeposit} €`;
+
+  const totalWithdrawals = account.movements
+    .filter(mov => mov < 0)
+    .reduce((acc, cur) => acc + cur, 0);
+
+  labelSumOut.textContent = `${Math.abs(totalWithdrawals)} €`;
+
+  const interest = account.movements
+    .filter(mov => mov > 0)
+    .map(deposit => (deposit * account.interestRate) / 100)
+    .filter(int => int >= 1)
+    .reduce((acc, cur) => acc + cur, 0);
+
+  labelSumInterest.textContent = `${interest.toFixed(2)} €`;
+};
 
 // CREATE USERNAME
-const createUsername = function(accts) {
-   accts.forEach(function(acc) {
-   acc.username = acc.owner
-  .toLowerCase()
-  .split(' ')
-  .map(name => name[0])
-  .join('');
-   }); 
-}
+const createUsername = function (accts) {
+  accts.forEach(function (acc) {
+    acc.username = acc.owner
+      .toLowerCase()
+      .split(' ')
+      .map(name => name[0])
+      .join('');
+  });
+};
 
 createUsername(accounts);
-// console.log(accounts);
+
+let currentAccount;
+
+// EVENT HANDLER FOR LOGIN
+btnLogin.addEventListener('click', function (event) {
+  // Prevent form from automatic submitting
+  event.preventDefault();
+
+  currentAccount = accounts.find(
+    acct => acct.username === inputLoginUsername.value.toLowerCase()
+  );
+
+  if (currentAccount?.pin === Number(inputLoginPin.value)) {
+    // Display UI and welcome message
+    labelWelcome.textContent = `Welcome back, ${
+      currentAccount.owner.split(' ')[0]
+    }`;
+    containerApp.style.opacity = 100;
+
+    // Clear input fields
+    inputLoginPin.value = '';
+    inputLoginUsername.value = '';
+    inputLoginPin.blur();
+
+    // Display movement
+    displayMovements(currentAccount.movements);
+
+    // Display balance
+    calcDisplayBalance(currentAccount.movements);
+
+    // Display summary
+    calcDisplaySummary(currentAccount);
+  } else {
+    containerApp.style.opacity = 0;
+    inputLoginPin.value = inputLoginUsername.value = '';
+    inputLoginUsername.focus();
+    labelWelcome.textContent = `Incorrect username or password, Try again!`;
+  }
+});
 
 /*
 const createUsername_ = function(user) {
@@ -124,5 +188,3 @@ const createUsername_ = function(user) {
 accounts.forEach(acc => acc.username = createUsername_(acc.owner));
 console.log(accounts);
 */
-
-
