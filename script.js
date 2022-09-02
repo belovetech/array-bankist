@@ -207,6 +207,27 @@ btnTransfer.addEventListener('click', function (event) {
   }
 });
 
+// EVENT HANDLER FOR CLOSING ACCOUNT
+btnClose.addEventListener('click', function (event) {
+  event.preventDefault();
+
+  if (
+    currentAccount.username === inputCloseUsername.value &&
+    currentAccount.pin === Number(inputClosePin.value)
+  ) {
+    const curIndex = accounts.findIndex(
+      acc => acc.username === currentAccount.username
+    );
+    // DELETE ACCOUNT
+    accounts.splice(curIndex, 1);
+
+    // Hide UI
+    containerApp.style.opacity = 0;
+    labelWelcome.textContent = `Login to get started`;
+  }
+  inputCloseUsername.value = inputClosePin.value = '';
+});
+
 /*
 const createUsername_ = function(user) {
    const username = user
