@@ -87,3 +87,34 @@ const displayMovements = function(movements) {
 }
 
 displayMovements(account1.movements);
+
+
+// CREATE USERNAME
+const createUsername = function(accts) {
+   accts.forEach(function(acc) {
+   acc.username = acc.owner
+  .toLowerCase()
+  .split(' ')
+  .map(name => name[0])
+  .join('');
+   }); 
+}
+
+createUsername(accounts);
+console.log(accounts);
+
+/*
+const createUsername_ = function(user) {
+   const username = user
+  .toLowerCase()
+  .split(' ')
+  .map(name => name[0])
+  .join('');
+  return username;
+}
+
+accounts.forEach(acc => acc.username = createUsername_(acc.owner));
+console.log(accounts);
+*/
+
+
