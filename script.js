@@ -207,6 +207,23 @@ btnTransfer.addEventListener('click', function (event) {
   }
 });
 
+// EVENT HANDLER FOR LOAN
+btnLoan.addEventListener('click', function (event) {
+  event.preventDefault();
+
+  const amount = Number(inputLoanAmount.value);
+
+  // Grant loan only if user has made a deposit of 10% of amount requested for
+  if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
+    currentAccount.movements.push(amount);
+
+    // Update UI
+    updateUI(currentAccount);
+  }
+  inputLoanAmount.value = '';
+  inputLoanAmount.blur();
+});
+
 // EVENT HANDLER FOR CLOSING ACCOUNT
 btnClose.addEventListener('click', function (event) {
   event.preventDefault();
