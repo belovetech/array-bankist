@@ -358,7 +358,7 @@ let sorted = false;
 btnSort.addEventListener('click', function (event) {
   event.preventDefault();
 
-  displayMovements(currentAccount.movements, !sorted);
+  displayMovements(currentAccount, !sorted);
 
   // flip sorted status
   sorted = !sorted;
